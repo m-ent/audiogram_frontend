@@ -4,7 +4,7 @@
 require 'gtk2'
 require 'net/http'
 require './id_validation'
-require './com_RS232C_AA79S'
+require './com_RS232C'
 require './audio_class'
 
 SERVER_IP = '127.0.0.1' #SERVER_IP = '172.16.41.20' #SERVER_IP = '192.168.1.6'
@@ -71,8 +71,8 @@ class AudioExam
         # header
         request["user-agent"] = "Ruby/#{RUBY_VERSION} MyHttpClient"
         request.set_content_type("multipart/form-data; boundary=image_boundary")
-	# body, following multipart/form-data manner
-	request.body = self.request_body
+        # body, following multipart/form-data manner
+        request.body = self.request_body
         response = http.request(request)
         puts response
       end
@@ -211,14 +211,14 @@ class Exam_window
       if valid_id?(@id_entry.text) and id_entry.text != ""
         @state = "receive"
         @msg_label.set_markup(@markup_msg.show(@state))
-	if @test_mode
-	  @audioexam = AudioExam.new('test')
-	  sent_data = @test_data
+        if @test_mode
+          @audioexam = AudioExam.new('test')
+          sent_data = @test_data
         else
-	  @audioexam = AudioExam.new('flight')
+          @audioexam = AudioExam.new('flight')
 #          sent_data = receive_data
-          sent_data = Rs232c.new.get_data_from_audiometer  # from 'com_RS232C_AA79S.rb'
-	end
+          sent_data = Rs232c.new.get_data_from_audiometer  # from 'com_RS232C.rb'
+        end
         if sent_data == "Timeout"
           @state = "timeout"
           @msg_label.set_markup(@markup_msg.show(@state))
@@ -230,11 +230,11 @@ class Exam_window
           rescue
             @state = "no_data"
             @msg_label.set_markup(markup_msg.show(@state))
-	  else
+          else
             @image.pixbuf = Gdk::Pixbuf.new("./result.png")
             @state = "transmit"
             @msg_label.set_markup(markup_msg.show(@state))
-	  end
+          end
           system("mpg123 -q " + Assets_location + "se.mp3")
         end
       else
@@ -258,7 +258,7 @@ class Exam_window
           comment += "PATCH_" if @comment_after_patch.active?
           comment += "MED_"   if @comment_after_med.active?
           comment += "OTHER:#{comment_other_entry.text}_"\
-	    if (@comment_other_check.active? or /\S+/ =~ @comment_other_entry.text)
+            if (@comment_other_check.active? or /\S+/ =~ @comment_other_entry.text)
           @audioexam.data[:comment] = comment
           @http_request = @audioexam.transmit
           reset_properties
@@ -298,7 +298,7 @@ class Exam_window
                 :test_mode, :test_data, :button_abort, :button_transmit,\
                 :comment_retry, :comment_masking, :comment_after_patch,\
                 :comment_after_med, :comment_other_check, :comment_other_entry,\
-		:http_request
+                :http_request
 end
 
 # -----

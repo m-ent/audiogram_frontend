@@ -16,3 +16,6 @@ tmp
 .yardoc
 _yardoc
 doc/
+
+#  Ignore temporary pngs made by tests
+result.png
