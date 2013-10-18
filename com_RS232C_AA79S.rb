@@ -3,15 +3,23 @@ require 'timeout'
 require 'serialport'
 
 class Rs232c
+  def initialize
+    os = `uname`
+    if /FreeBSD/ =~ os
+      @port = "/dev/cuaU0"
+    elsif /Linux/ =~ os
+      @port = "/dev/ttyUSB0" 
+    end
+  end
+
   def get_data_from_audiometer
-    port = "/dev/cuaU0"
     baud_rate = 9600
     data_bits = 7
     stop_bits = 1
     parity = SerialPort::EVEN
     timelimit = 1200   # i.e. 1200 seconds = 20 mins
 
-    sp = SerialPort.new(port, baud_rate, data_bits, stop_bits, parity)
+    sp = SerialPort.new(@port, baud_rate, data_bits, stop_bits, parity)
     stream = String.new
 
     begin
